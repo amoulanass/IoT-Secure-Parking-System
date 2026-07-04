@@ -1,0 +1,72 @@
+from machine import Pin, SoftSPI
+from mfrc522 import MFRC522
+
+# Définition des broches pour le SPI
+sck = Pin(18, Pin.OUT)
+copi = Pin(23, Pin.OUT)  # Controller out, peripheral in
+cipo = Pin(19, Pin.OUT)  # Controller in, peripheral out
+spi = SoftSPI(baudrate=100000, polarity=0, phase=0, sck=sck, mosi=copi, miso=cipo)
+
+# Définition de la broche SDA pour MFRC522
+sda = Pin(21    , Pin.OUT)
+reader = MFRC522(spi, sda)
+
+# Définition des broches pour les LEDs
+led_rouge = Pin(22, Pin.OUT)  # Broche pour la LED rouge (non autorisé)
+led_verte = Pin(2, Pin.OUT)   # Broche pour la LED verte (autorisé)
+
+# Liste des UID autorisés (exemple de 4 octets par UID)
+# uid_autorises = [0x39, 0x69, 0x15, 0xB3]
+   
+
+# # Fonction pour vérifier si l'UID est dans la liste des autorisés
+# def est_uid_autorise(uid):
+#     for autorise in uid_autorises:
+#         if uid == autorise:
+#             return True
+#     return False
+
+uid_autorises = [
+    [0x39, 0x69, 0x15, 0xB3],  # UID autorisé exemple
+]
+
+# Fonction pour vérifier si l'UID est dans la liste des autorisés
+def est_uid_autorise(uid):
+    # Si l'UID a 5 octets, on ne garde que les 4 premiers
+    if len(uid) == 5:
+        uid = uid[:4]  # Ne garder que les 4 premiers octets
+    for autorise in uid_autorises:
+        if uid == autorise:  # Comparaison des listes
+            return True
+    return False
+
+print('Place Card In Front Of Device To Write Unique Address')
+print('')
+
+while True:
+    try:
+        # Demander à détecter une carte
+        (status, tag_type) = reader.request(reader.CARD_REQIDL)
+        if status == reader.OK:
+            (status, raw_uid) = reader.anticoll()
+            if status == reader.OK:
+                print('New Card Detected')
+                print('  - Tag Type: 0x%02x' % tag_type)
+                print(raw_uid)
+                print('  - UID: 0x%02x%02x%02x%02x' % (raw_uid[0], raw_uid[1], raw_uid[2], raw_uid[3]))
+               
+                # Vérifier si l'UID est dans la liste des autorisés
+                if est_uid_autorise(raw_uid):
+                    print("Carte autorisée")
+                    led_verte.on()  # Allumer la LED verte
+                    led_rouge.off()  # Éteindre la LED rouge
+                else:
+                    print("Carte non autorisée")
+                    led_rouge.on()  # Allumer la LED rouge
+                    led_verte.off()  # Éteindre la LED verte
+               
+                print('')
+    except KeyboardInterrupt:
+        break
+
+
