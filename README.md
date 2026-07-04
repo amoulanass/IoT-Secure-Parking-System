@@ -1,10 +1,10 @@
-# 🚗 IoT Secure Parking System
+ IoT Secure Parking System
 
-## 📋 Description
+* Description
 Smart and secure parking management system 
 built with ESP32 and MicroPython.
 
-## 🛠️ Technologies
+* Technologies
 - MicroPython (ESP32)
 - RFID MFRC522
 - Ultrasonic Sensor HC-SR04
@@ -12,13 +12,13 @@ built with ESP32 and MicroPython.
 - Wokwi Simulation
 - Thonny IDE
 
-## ⚙️ Features
+* Features
 - RFID authentication (authorized/unauthorized)
 - Automatic barrier control
 - Real-time parking spot detection
 - LED indicators
 
-## 👩‍💻 Author
-**Amal Nasser**
+* Author
+Amal Nasser
 Master's in Electronics & Telecommunications
 📧 amal.nasser@isimg.tn
